@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'cgi'
+require 'fileutils'
 
 require 'rubygems'
 require 'bundler/setup'
@@ -12,7 +13,10 @@ require 'awesome_print'
 require 'hashie'
 require 'rest_client'
 require 'nokogiri'
-require 'mongo_mapper'
+# require 'mongo_mapper'
+
+require 'active_support/core_ext'
+
 require 'addressable/uri'
 require 'dante'
 
@@ -23,18 +27,26 @@ module NewsMonster
 	autoload :Article, 			'news_monster/article'
 	autoload :ArticlesService,  'news_monster/articles_service'
 	autoload :CompositeArticle, 'news_monster/composite_article'
+
+	extend Config
+
+	def self.root
+		File.join './..', File.dirname(__FILE__)
+	end
 end
 
-NewsMonster::Config.load
+NewsMonster.load
 
 
-
+# opts: host, pid_path, port, daemonize, user, group
 Dante.run('news-monster') do |opts|
-  # opts: host, pid_path, port, daemonize, user, group
-  while true do
-  	puts "Polling NYTimes ... "
-	NewsMonster::ArticlesService.new.fetch_latest	
-	puts "zzz ... "
-	sleep(30)
-  end
+	service = NewsMonster::ArticlesService.new
+  	
+	  while true do
+		puts "Polling NYTimes ... "
+		
+		service.fetch_latest	
+		
+		sleep(30); puts "zzz ... "
+	  end
 end

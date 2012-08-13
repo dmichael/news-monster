@@ -1,27 +1,32 @@
+require 'json'
+
 module NewsMonster
     class CompositeArticle < Hashie::Mash
 
         def self.from_item(item)
+            # Active support makes this possible
             article = self.new JSON.parse(JSON.generate item)
             
-            article.fetch_short_url
-            article.fetch_body
+            article.fetch_short_url!
+            article.fetch_body!
 
             article
         end
         
         # Shorten is the only call that returns the nyt.ms domain, lookup, which is batch does not
-        def fetch_short_url
-            bitly = Bitly.new(Config.config.bitly.username, Config.config.bitly.api_key)
-            self.short_url = bitly.shorten(url).short_url
+        def fetch_short_url!
+            bitly     = Bitly.new(NewsMonster.config.bitly.username, NewsMonster.config.bitly.api_key)
+            shortened = bitly.shorten(url)
+            
+            self.short_url   = shortened.short_url
+            self.global_hash = shortened.global_hash
+            self.user_hash   = shortened.user_hash
         end
 
-        def fetch_body
-            begin 
-                execute_fetch_body(self.url)
-            rescue RestClient::Exception => e
-                puts "Error getting page #{e.message}"
-            end
+        def fetch_body!
+            execute_fetch_body(self.url)
+        rescue RestClient::Exception => e
+            puts "Error getting page #{e.message}"
         end
 
         def execute_fetch_body(uri, body = "", visited = [])

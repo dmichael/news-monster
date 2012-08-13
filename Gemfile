@@ -7,7 +7,10 @@ gem 'bitly'
 gem 'hashie'
 gem "rest-client", "~> 1.6.7"
 gem 'nokogiri'
-gem 'mongo_mapper'
+
 gem 'bson_ext'
 gem 'addressable'
 gem 'dante'
+gem 'i18n'
+gem 'active_support'
+gem 'terminal-notifier'
