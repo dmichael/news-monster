@@ -17,11 +17,16 @@ module NewsMonster
         end
 
         def fetch_body
-            execute_fetch_body self.url
+            begin 
+                execute_fetch_body(self.url)
+            rescue RestClient::Exception => e
+                puts "Error getting page #{e.message}"
+            end
         end
 
         def execute_fetch_body(uri, body = "", visited = [])
             uri = Addressable::URI.parse uri
+            puts " =========> #{uri}"
             doc = Nokogiri::HTML RestClient.get(uri.to_s)
             # let's not loop infinitely
             visited << uri.to_s

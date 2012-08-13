@@ -1,7 +1,9 @@
+#!/usr/bin/env ruby
+
 require 'cgi'
 
-require "rubygems"
-require "bundler/setup"
+require 'rubygems'
+require 'bundler/setup'
 
 require 'times_wire'
 require 'bitly'
@@ -11,8 +13,8 @@ require 'hashie'
 require 'rest_client'
 require 'nokogiri'
 require 'mongo_mapper'
-require "addressable/uri"
-
+require 'addressable/uri'
+require 'dante'
 
 $LOAD_PATH << File.dirname(__FILE__)
 
@@ -26,4 +28,13 @@ end
 NewsMonster::Config.load
 
 
-NewsMonster::ArticlesService.new.fetch_latest
+
+Dante.run('news-monster') do |opts|
+  # opts: host, pid_path, port, daemonize, user, group
+  while true do
+  	puts "Polling NYTimes ... "
+	NewsMonster::ArticlesService.new.fetch_latest	
+	puts "zzz ... "
+	sleep(30)
+  end
+end

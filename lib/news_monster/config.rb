@@ -9,9 +9,9 @@ module NewsMonster
     end
 
     def self.load
-      MongoMapper.database = config.database
-      Bitly.use_api_version_3
+      MongoMapper.database    = config.database
       TimesWire::Base.api_key = config.times_api.newswire_key
+      Bitly.use_api_version_3
     end
 
   end
